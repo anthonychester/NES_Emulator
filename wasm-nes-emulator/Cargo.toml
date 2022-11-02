@@ -1,5 +1,5 @@
 [package]
-name = "wasm-game-of-life"
+name = "wasm-nes-emulator"
 version = "0.1.0"
 authors = ["Anthony Chester<anthonychester71@gmail.com>"]
 edition = "2018"
