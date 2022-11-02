@@ -1,5 +1,5 @@
-import { Universe, Cell } from "wasm-game-of-life";
-import { memory } from "wasm-game-of-life/wasm_game_of_life_bg";
+import { Universe, Cell } from "wasm-nes-emulator";
+import { memory } from "wasm-nes-emulator/wasm_nes_emulator_bg";
 
 const CELL_SIZE = 3; // px
 const GRID_COLOR = "#CCCCCC";

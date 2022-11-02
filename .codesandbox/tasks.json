@@ -14,11 +14,11 @@
     },
     "buildwasm": {
       "name": "buildwasm",
-      "command": "cd wasm-game-of-life && wasm-pack build"
+      "command": "cd wasm-nes-emulator && wasm-pack build"
     },
     "run": {
       "name": "run",
-      "command": "cd wasm-game-of-life/www && npm run start"
+      "command": "cd wasm-nes-emulator/www && npm run start"
     }
   }
 }
