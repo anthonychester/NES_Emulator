@@ -430,3 +430,166 @@ mod sbc {
     }
     
 }
+//new
+mod bpl {
+    use super::*;
+    
+    #[test]
+    fn bpl_true() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x05, 0x10, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x05);
+    }
+    
+     #[test]
+    fn bpl_false() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x85, 0x10, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00);
+    }
+}
+mod bmi {
+    use super::*;
+    
+    #[test]
+    fn bmi_true() {
+        let mut cpu = CPU::new();
+        
+        cpu.load_and_run(vec![0xa9, 0x85, 0x30, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x85);
+    }
+    
+     #[test]
+    fn bmi_false() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x05, 0x30, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00);
+    }
+}
+mod bvc {
+    use super::*;
+    
+    #[test]
+    fn bvc_true() {
+        let mut cpu = CPU::new();
+        
+        cpu.load_and_run(vec![0xa9, 0x05, 0x69, 0x01, 0x50, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x06); //1 added in program
+    }
+    
+     #[test]
+    fn bvc_false() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x7f, 0x69, 0x01, 0x50, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00);
+    }
+}
+mod bvs {
+    use super::*;
+    
+    #[test]
+    fn bvs_true() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x7f, 0x69, 0x01, 0x70, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x80); //1 added in program
+        
+    }
+    
+     #[test]
+    fn bvs_false() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x05, 0x69, 0x01, 0x70, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00);
+        
+    }
+}
+mod bcc {
+    use super::*;
+    
+    #[test]
+    fn bcc_true() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0xff, 0x69, 0x01, 0x90, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00);
+        
+    }
+    
+     #[test]
+    fn bcc_false() {
+        let mut cpu = CPU::new();
+        
+        cpu.load_and_run(vec![0xa9, 0x0f, 0x69, 0x01, 0x90, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x10); //1 added in program
+    }
+}
+mod bcs {
+    use super::*;
+    
+    #[test]
+    fn bcs_true() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0xff, 0x69, 0x01, 0xB0, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00);
+        
+    }
+    
+     #[test]
+    fn bcs_false() {
+        let mut cpu = CPU::new();
+        
+        cpu.load_and_run(vec![0xa9, 0x0f, 0x69, 0x01, 0xB0, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00); //1 added in program
+    }
+}
+mod bne {
+    use super::*;
+    
+    #[test]
+    fn bne_true() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x05, 0xD0, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x05);
+        
+    }
+    
+     #[test]
+    fn bne_false() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xD0, 0x02, 0xa9, 0x01, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00);
+    }
+}
+mod beq {
+    use super::*;
+    
+    #[test]
+    fn beq_true() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xF0, 0x02, 0xa9, 0x01, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x01);
+        
+    }
+    
+     #[test]
+    fn beq_false() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x05, 0xF0, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00);
+    }
+}

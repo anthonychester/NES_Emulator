@@ -111,9 +111,21 @@ OpCode::new(0xFD, "SBC", 3, 4, AddressingMode::Absolute_X),
 OpCode::new(0xF9, "SBC", 3, 4, AddressingMode::Absolute_Y),
 OpCode::new(0xE1, "SBC", 2, 6, AddressingMode::Indirect_X),
 OpCode::new(0xF1, "SBC", 2, 5, AddressingMode::Indirect_Y),
+
+OpCode::new(0x10, "BPL", 2, 2, AddressingMode::NoneAddressing),
+OpCode::new(0x30, "BMI", 2, 2, AddressingMode::NoneAddressing),
+OpCode::new(0x50, "BVC", 2, 2, AddressingMode::NoneAddressing),
+OpCode::new(0x70, "BVS", 2, 2, AddressingMode::NoneAddressing),
+OpCode::new(0x90, "BCC", 2, 2, AddressingMode::NoneAddressing),
+OpCode::new(0xB0, "BCS", 2, 2, AddressingMode::NoneAddressing),
+OpCode::new(0xD0, "BNE", 2, 2, AddressingMode::NoneAddressing),
+OpCode::new(0xF0, "BEQ", 2, 2, AddressingMode::NoneAddressing),
+
 ];
 
 // BNE CPM CPY CPX
+
+//BPL BMI BVC BVS BCC BCS BEQ
 
 pub static ref OPSCODES_MAP: HashMap<u8, &'static OpCode> = {
     let mut map = HashMap::new();

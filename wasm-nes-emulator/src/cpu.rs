@@ -174,6 +174,14 @@ impl CPU {
                 0x09 | 0x05 | 0x15 | 0x0D | 0x1D | 0x19 | 0x01 | 0x11 => self.ora(&opcode.address_mode),
                 0x69 | 0x65 | 0x75 | 0x6D | 0x7D | 0x79 | 0x61 | 0x71 => self.adc(&opcode.address_mode),
                 0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 | 0xF1 => self.sbc(&opcode.address_mode),
+                0x10 => self.branch((self.status & 0b1000_0000) == 0), // BPL if not negative flag
+                0x30 => self.branch((self.status & 0b1000_0000) != 0), // BMI if negative flag
+                0x50 => self.branch((self.status & 0b0100_0000) == 0), // BVC if not overflow flag
+                0x70 => self.branch((self.status & 0b0100_0000) != 0), // BVS if overflow flag
+                0x90 => self.branch((self.status & 0b0000_0001) == 0), // BCC if not clear flag
+                0xB0 => self.branch((self.status & 0b0000_0001) != 0), // BCS if clear flag
+                0xD0 => self.branch((self.status & 0b0000_0010) == 0), // BNE if not zero flag
+                0xF0 => self.branch((self.status & 0b0000_0010) != 0), // BEQ if zero flag
                 0xEA => (),
                 0x00 => {
                     return
@@ -210,6 +218,18 @@ impl CPU {
         }
         self.register_a = sum as u8;
         self.update_zero_and_negative_flags(self.register_a);
+    }
+    
+    fn branch(&mut self, cond: bool) {
+        if cond {
+            let value = self.mem_read(self.program_counter);//get the jump ammount from next line
+            let jump_addr = self
+                    .program_counter
+                    .wrapping_add(1)
+                    .wrapping_add(value as u16);
+
+            self.program_counter = jump_addr;
+        }
     }
     
     fn adc(&mut self, mode: &AddressingMode) {
