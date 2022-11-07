@@ -121,6 +121,20 @@ OpCode::new(0xB0, "BCS", 2, 2, AddressingMode::NoneAddressing),
 OpCode::new(0xD0, "BNE", 2, 2, AddressingMode::NoneAddressing),
 OpCode::new(0xF0, "BEQ", 2, 2, AddressingMode::NoneAddressing),
 
+OpCode::new(0xE6, "INC", 2, 5, AddressingMode::ZeroPage),
+OpCode::new(0xF6, "INC", 2, 6, AddressingMode::ZeroPage_X),
+OpCode::new(0xEE, "INC", 3, 6, AddressingMode::Absolute),
+OpCode::new(0xFE, "INC", 3, 7, AddressingMode::Absolute_X),
+
+OpCode::new(0x18, "CLC", 1, 2, AddressingMode::NoneAddressing),
+OpCode::new(0x38, "SEC", 1, 2, AddressingMode::NoneAddressing),
+OpCode::new(0x58, "CLI", 1, 2, AddressingMode::NoneAddressing),
+OpCode::new(0x78, "SEI", 1, 2, AddressingMode::NoneAddressing),
+OpCode::new(0xB8, "CLV", 1, 2, AddressingMode::NoneAddressing),
+OpCode::new(0xD8, "CLD", 1, 2, AddressingMode::NoneAddressing),
+OpCode::new(0xF8, "SED", 1, 2, AddressingMode::NoneAddressing),
+
+
 ];
 
 // BNE CPM CPY CPX

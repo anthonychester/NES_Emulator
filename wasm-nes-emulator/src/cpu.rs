@@ -182,6 +182,14 @@ impl CPU {
                 0xB0 => self.branch((self.status & 0b0000_0001) != 0), // BCS if clear flag
                 0xD0 => self.branch((self.status & 0b0000_0010) == 0), // BNE if not zero flag
                 0xF0 => self.branch((self.status & 0b0000_0010) != 0), // BEQ if zero flag
+                0xE6 | 0xF6 | 0xEE | 0xFE => self.inc(&opcode.address_mode),
+                0x18 => self.rem_flag(0b1111_1110),
+                0x38 => self.set_flag(0b0000_0001),
+                0x58 => self.rem_flag(0b1111_1011),
+                0x78 => self.set_flag(0b0000_0100),
+                0xB8 => self.rem_flag(0b1011_1111),
+                0xD8 => self.rem_flag(0b1111_0111),
+                0xF8 => self.set_flag(0b0000_1000),
                 0xEA => (),
                 0x00 => {
                     return
@@ -230,6 +238,13 @@ impl CPU {
 
             self.program_counter = jump_addr;
         }
+    }
+    //set_flag(0b0000_0001)
+    fn set_flag(&mut self, flag: u8) {
+        self.status = self.status | flag;
+    }
+    fn rem_flag(&mut self, flag: u8) {
+        self.status = self.status & flag;
     }
     
     fn adc(&mut self, mode: &AddressingMode) {
@@ -332,6 +347,13 @@ impl CPU {
         let value = self.get_value(mode);
         self.register_a = self.register_a ^ value;
         self.update_zero_and_negative_flags(self.register_a);
+    }
+    
+    fn inc(&mut self, mode: &AddressingMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem_read(addr).wrapping_add(1);
+        self.mem_write(addr, value);
+        self.update_zero_and_negative_flags(value);
     }
     
     fn update_zero_and_negative_flags(&mut self, result: u8) {

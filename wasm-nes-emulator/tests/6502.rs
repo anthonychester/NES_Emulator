@@ -430,7 +430,6 @@ mod sbc {
     }
     
 }
-//new
 mod bpl {
     use super::*;
     
@@ -591,5 +590,99 @@ mod beq {
         cpu.load_and_run(vec![0xa9, 0x05, 0xF0, 0x02, 0xa9, 0x00, 0x00]);
         
         assert_eq!(cpu.register_a, 0x00);
+    }
+}
+//new
+mod inc {
+    use super::*;
+    
+    #[test]
+    fn inc_9() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x09, 0x85, 0x02, 0xe6, 0x02, 0xa5, 0x02, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x0a);
+        
+    }
+    #[test]
+    fn inc_overflow() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0xff, 0x85, 0x02, 0xe6, 0x02, 0xa5, 0x02, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00);
+        
+    }
+}
+mod flag_inst {
+    use super::*;
+    
+    #[test]
+    fn clc() {
+        let mut cpu = CPU::new();
+        cpu.status = 0b0000_0001;
+        cpu.load_and_run(vec![0x18, 0x00]);
+        
+        assert_eq!(cpu.status, 0b0000_0000);
+        
+    }
+    
+    #[test]
+    fn sec() {
+        let mut cpu = CPU::new();
+        cpu.status = 0b0000_0000;
+        cpu.load_and_run(vec![0x38, 0x00]);
+        
+        assert_eq!(cpu.status, 0b0000_0001);
+        
+    }
+    
+    #[test]
+    fn cli() {
+        let mut cpu = CPU::new();
+        cpu.status = 0b0000_0100;
+        cpu.load_and_run(vec![0x58, 0x00]);
+        
+        assert_eq!(cpu.status, 0b0000_0000);
+        
+    }
+    
+    #[test]
+    fn sei() {
+        let mut cpu = CPU::new();
+        cpu.status = 0b0000_0000;
+        cpu.load_and_run(vec![0x78, 0x00]);
+        
+        assert_eq!(cpu.status, 0b0000_0100);
+        
+    }
+    
+    #[test]
+    fn clv() {
+        let mut cpu = CPU::new();
+        cpu.status = 0b0100_0000;
+        cpu.load_and_run(vec![0xB8, 0x00]);
+        
+        assert_eq!(cpu.status, 0b0000_0000);
+        
+    }
+    
+    #[test]
+    fn cld() {
+        let mut cpu = CPU::new();
+        cpu.status = 0b0000_1000;
+        cpu.load_and_run(vec![0xD8, 0x00]);
+        
+        assert_eq!(cpu.status, 0b0000_0000);
+        
+    }
+    
+    #[test]
+    fn sed() {
+        let mut cpu = CPU::new();
+        cpu.status = 0b0000_0000;
+        cpu.load_and_run(vec![0xF8, 0x00]);
+        
+        assert_eq!(cpu.status, 0b0000_1000);
+        
     }
 }
