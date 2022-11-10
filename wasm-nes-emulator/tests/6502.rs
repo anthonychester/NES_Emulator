@@ -686,3 +686,165 @@ mod flag_inst {
         
     }
 }
+
+mod bit {
+    use super::*;
+    #[test]
+    fn bit_C2_FF() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0xC2 , 0x85, 0xC2 , 0xa9, 0xff, 0x24, 0xC2, 0x00]);
+        
+        assert_eq!(cpu.status, 0b1100_0000);
+        
+    }
+    
+    #[test]
+    fn bit_FF_C2() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0xF0 , 0x85, 0xC2 , 0xa9, 0x0F, 0x24, 0xC2, 0x00]);
+        
+        assert_eq!(cpu.status, 0b1100_0010);
+        
+    }
+}
+
+mod cmp {
+    use super::*;
+    #[test]
+    fn cmp_eq() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x05 , 0xc9, 0x05 , 0xd0, 0x02, 0xa9, 0x01, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x01);
+        
+    }
+    #[test]
+    fn cmp_gt_p() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x05, 0xc9, 0x03, 0xf0, 0x04, 0xb0, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x05);
+        
+    }
+    
+    #[test]
+    fn cmp_gt_f() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x05, 0xc9, 0x09, 0xf0, 0x04, 0xb0, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00);
+        
+    }
+    
+    #[test]
+    fn cmp_lt_p() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x03, 0xc9, 0x05, 0x90, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x03);
+        
+    }
+    
+    #[test]
+    fn cmp_lt_f() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x09, 0xc9, 0x05, 0x90, 0x02, 0xa9, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00);
+        
+    }
+}
+
+mod cmx {
+    use super::*;
+    #[test]
+    fn cmx_eq() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa2, 0x05 , 0xe0, 0x05 , 0xd0, 0x02, 0xa2, 0x01, 0x00]);
+        
+        assert_eq!(cpu.register_x, 0x01);
+        
+    }
+    #[test]
+    fn cmx_gt_p() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa2, 0x05, 0xe0, 0x03, 0xf0, 0x04, 0xb0, 0x02, 0xa2, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_x, 0x05);
+        
+    }
+    
+    #[test]
+    fn cmx_gt_f() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa2, 0x05, 0xe0, 0x09, 0xf0, 0x04, 0xb0, 0x02, 0xa2, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_x, 0x00);
+        
+    }
+    
+    #[test]
+    fn cmx_lt_p() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa2, 0x03, 0xe0, 0x05, 0x90, 0x02, 0xa2, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_x, 0x03);
+        
+    }
+    
+    #[test]
+    fn cmx_lt_f() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa2, 0x09, 0xe0, 0x05, 0x90, 0x02, 0xa2, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_x, 0x00);
+        
+    }
+}
+
+mod cmy {
+    use super::*;
+    #[test]
+    fn cmy_eq() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa0, 0x05 , 0xc0, 0x05 , 0xd0, 0x02, 0xa0, 0x01, 0x00]);
+        
+        assert_eq!(cpu.register_y, 0x01);
+        
+    }
+    #[test]
+    fn cmy_gt_p() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa0, 0x05, 0xc0, 0x03, 0xf0, 0x04, 0xb0, 0x02, 0xa0, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_y, 0x05);
+        
+    }
+    
+    #[test]
+    fn cmy_gt_f() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa0, 0x05, 0xc0, 0x09, 0xf0, 0x04, 0xb0, 0x02, 0xa0, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_y, 0x00);
+        
+    }
+    
+    #[test]
+    fn cmy_lt_p() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa0, 0x03, 0xc0, 0x05, 0x90, 0x02, 0xa0, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_y, 0x03);
+        
+    }
+    
+    #[test]
+    fn cmy_lt_f() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa0, 0x09, 0xc0, 0x05, 0x90, 0x02, 0xa0, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_y, 0x00);
+        
+    }
+}

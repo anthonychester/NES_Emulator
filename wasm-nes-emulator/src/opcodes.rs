@@ -134,12 +134,32 @@ OpCode::new(0xB8, "CLV", 1, 2, AddressingMode::NoneAddressing),
 OpCode::new(0xD8, "CLD", 1, 2, AddressingMode::NoneAddressing),
 OpCode::new(0xF8, "SED", 1, 2, AddressingMode::NoneAddressing),
 
+OpCode::new(0x24, "BIT", 2, 3, AddressingMode::ZeroPage),
+OpCode::new(0x2C, "BIT", 3, 4, AddressingMode::Absolute),
 
+OpCode::new(0xC9, "CMP", 2, 2, AddressingMode::Immediate),
+OpCode::new(0xC5, "CMP", 2, 3, AddressingMode::ZeroPage),
+OpCode::new(0xD5, "CMP", 2, 4, AddressingMode::ZeroPage_X),
+OpCode::new(0xCD, "CMP", 3, 4, AddressingMode::Absolute),
+OpCode::new(0xDD, "CMP", 3, 4, AddressingMode::Absolute_X),
+OpCode::new(0xD9, "CMP", 3, 4, AddressingMode::Absolute_Y),
+OpCode::new(0xC1, "CMP", 2, 6, AddressingMode::Indirect_X),
+OpCode::new(0xD1, "CMP", 2, 5, AddressingMode::Indirect_Y),
+
+OpCode::new(0xE0, "CMX", 2, 2, AddressingMode::Immediate),
+OpCode::new(0xE4, "CMX", 2, 3, AddressingMode::ZeroPage),
+OpCode::new(0xEC, "CMX", 3, 4, AddressingMode::Absolute),
+
+OpCode::new(0xE0, "CMY", 2, 2, AddressingMode::Immediate),
+OpCode::new(0xE4, "CMY", 2, 3, AddressingMode::ZeroPage),
+OpCode::new(0xEC, "CMY", 3, 4, AddressingMode::Absolute),
+
+OpCode::new(0xC0, "CMY", 2, 2, AddressingMode::Immediate),
+OpCode::new(0xC4, "CMY", 2, 3, AddressingMode::ZeroPage),
+OpCode::new(0xCC, "CMY", 3, 4, AddressingMode::Absolute),
 ];
 
-// BNE CPM CPY CPX
-
-//BPL BMI BVC BVS BCC BCS BEQ
+//CPM CPY CPX
 
 pub static ref OPSCODES_MAP: HashMap<u8, &'static OpCode> = {
     let mut map = HashMap::new();

@@ -190,6 +190,10 @@ impl CPU {
                 0xB8 => self.rem_flag(0b1011_1111),
                 0xD8 => self.rem_flag(0b1111_0111),
                 0xF8 => self.set_flag(0b0000_1000),
+                0x24 | 0x2C => self.bit(&opcode.address_mode),
+                0xC9 | 0xC5 | 0xD5 | 0xCD | 0xDD | 0xD9 | 0xC1 | 0xD1 => self.compare(self.register_a, &opcode.address_mode),
+                0xE0 | 0xE4 | 0xEC => self.compare(self.register_x, &opcode.address_mode),
+                0xC0 | 0xC4 | 0xCC => self.compare(self.register_y, &opcode.address_mode),
                 0xEA => (),
                 0x00 => {
                     return
@@ -245,6 +249,50 @@ impl CPU {
     }
     fn rem_flag(&mut self, flag: u8) {
         self.status = self.status & flag;
+    }
+    
+    fn compare(&mut self, reg: u8, mode: &AddressingMode) {
+        let value = self.get_value(mode);
+        let res = (value as i8).wrapping_neg().wrapping_sub(1) as u8;
+        if reg >= value { //set carry if >=
+            self.status = self.status | 0b0000_0001; //add carry flag
+        } else {
+             self.status = self.status & 0b1111_1110; //remove carry flag
+        }
+        if reg == value {
+            self.status = self.status | 0b0000_0010;
+        } else {
+            self.status = self.status & 0b1111_1101;
+        }
+        
+        if res & 0b1000_0000 != 0 {
+            self.status = self.status | 0b1000_0000;
+        } else {
+            self.status = self.status & 0b0111_1111;
+        }
+    }
+    
+    fn bit(&mut self, mode: &AddressingMode) {
+        let value = self.get_value(mode);
+        let res = self.register_a & value;
+        //check Z flag
+        if res == 0 {
+            self.status = self.status | 0b0000_0010;
+        } else {
+            self.status = self.status & 0b1111_1101;
+        }
+        //check N flag
+        if value & 0b1000_0000 != 0 {
+            self.status = self.status | 0b1000_0000;
+        } else {
+            self.status = self.status & 0b0111_1111;
+        }
+        //check V flag
+        if value & 0b0100_0000 != 0 {
+            self.status = self.status | 0b0100_0000;
+        } else {
+            self.status = self.status & 0b1011_1111;
+        }
     }
     
     fn adc(&mut self, mode: &AddressingMode) {
