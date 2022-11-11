@@ -19,6 +19,10 @@
     "run": {
       "name": "run",
       "command": "cd wasm-nes-emulator/www && npm run start"
+    },
+    "test": {
+      "name": "test",
+      "command": "cd wasm-nes-emulator && cargo test"
     }
   }
 }

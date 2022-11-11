@@ -159,8 +159,6 @@ OpCode::new(0xC4, "CMY", 2, 3, AddressingMode::ZeroPage),
 OpCode::new(0xCC, "CMY", 3, 4, AddressingMode::Absolute),
 ];
 
-//CPM CPY CPX
-
 pub static ref OPSCODES_MAP: HashMap<u8, &'static OpCode> = {
     let mut map = HashMap::new();
     for op in &*CPU_OPS_CODES {

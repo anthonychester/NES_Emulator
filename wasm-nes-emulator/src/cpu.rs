@@ -1,3 +1,7 @@
+.......use wasm_bindgen::prelude::*;
+extern crate web_sys;
+use web_sys::window;
+
 use std::collections::HashMap;
 use crate::opcodes;
 
@@ -16,7 +20,7 @@ pub enum AddressingMode {
    NoneAddressing,
 }
 
-//#[wasm_bindgen]
+#[wasm_bindgen]
 pub struct CPU {
     pub register_a: u8,
     pub register_x: u8,
@@ -27,6 +31,7 @@ pub struct CPU {
     memory: [u8; 0xFFFF]
 }
 
+#[wasm_bindgen]
 impl CPU {
     pub fn new() -> Self {
         CPU {
@@ -38,7 +43,22 @@ impl CPU {
             memory: [0; 0xFFFF],
         }
     }
+
+    pub fn mem_ptr(&self) -> *const u8 {
+        self.memory.as_ptr()
+    }
     
+    pub fn load_pro(&mut self, program: Vec<u8>) {
+    let window = window().unwrap();
+    window.alert_with_message("LP!");
+        self.memory[0x8000 .. (0x8000 + program.len())].copy_from_slice(&program[..]);
+        self.mem_write_u16(0xFFFC, 0x8000);
+    }
+    
+}
+
+
+impl CPU {
     pub fn mem_read(&self, addr: u16) -> u8 {
         self.memory[addr as usize]
     }
@@ -141,14 +161,19 @@ impl CPU {
 
 }
 
+#[wasm_bindgen]
 impl CPU {
 
-    pub fn run(&mut self) {        
-    let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPSCODES_MAP;
+    pub fn next(&mut self) -> bool {
     
-        loop {
-            //let opscode = self.mem_read(self.program_counter);
+        let window = window().unwrap();
+    window.alert_with_message("Win!");
+    
+        let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPSCODES_MAP;
+        
+        //let opscode = self.mem_read(self.program_counter);
             let code = self.mem_read(self.program_counter);
+            println!("{:x}", code);
             self.program_counter += 1;
             let program_counter_state = self.program_counter;
             
@@ -196,7 +221,7 @@ impl CPU {
                 0xC0 | 0xC4 | 0xCC => self.compare(self.register_y, &opcode.address_mode),
                 0xEA => (),
                 0x00 => {
-                    return
+                    return true;
                 }
                 _ => todo!()
             }
@@ -204,6 +229,18 @@ impl CPU {
             
             if program_counter_state == self.program_counter {
                 self.program_counter += (opcode.bytes - 1) as u16;
+            }
+            
+            return false;
+    }
+
+    pub fn run(&mut self) {        
+    let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPSCODES_MAP;
+    
+        loop {
+            
+            if self.next() { //return true if needed to break
+                break;
             }
             
         //println!("pc: {}, a: {}, x: {}, y: {}, op: {:#04x}", self.program_counter, self.register_a, self.register_x, self.register_y, opscode);
@@ -309,6 +346,9 @@ impl CPU {
        let value = self.get_value(mode);
        self.register_a = value;
        self.update_zero_and_negative_flags(self.register_a);
+       
+       let window = window().unwrap();
+    window.alert_with_message("Win!");
    }
    
    fn ldx(&mut self, mode: &AddressingMode) {
