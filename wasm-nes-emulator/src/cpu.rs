@@ -1,4 +1,4 @@
-.......use wasm_bindgen::prelude::*;
+use wasm_bindgen::prelude::*;
 extern crate web_sys;
 use web_sys::window;
 
@@ -49,8 +49,6 @@ impl CPU {
     }
     
     pub fn load_pro(&mut self, program: Vec<u8>) {
-    let window = window().unwrap();
-    window.alert_with_message("LP!");
         self.memory[0x8000 .. (0x8000 + program.len())].copy_from_slice(&program[..]);
         self.mem_write_u16(0xFFFC, 0x8000);
     }
@@ -165,10 +163,7 @@ impl CPU {
 impl CPU {
 
     pub fn next(&mut self) -> bool {
-    
-        let window = window().unwrap();
-    window.alert_with_message("Win!");
-    
+        
         let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPSCODES_MAP;
         
         //let opscode = self.mem_read(self.program_counter);
@@ -343,12 +338,13 @@ impl CPU {
     }
         
     fn lda(&mut self, mode: &AddressingMode) {
+    
+        let window = window().unwrap();
+       window.alert_with_message("Win!");
+        
        let value = self.get_value(mode);
        self.register_a = value;
        self.update_zero_and_negative_flags(self.register_a);
-       
-       let window = window().unwrap();
-    window.alert_with_message("Win!");
    }
    
    fn ldx(&mut self, mode: &AddressingMode) {
