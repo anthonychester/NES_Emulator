@@ -150,10 +150,6 @@ OpCode::new(0xE0, "CMX", 2, 2, AddressingMode::Immediate),
 OpCode::new(0xE4, "CMX", 2, 3, AddressingMode::ZeroPage),
 OpCode::new(0xEC, "CMX", 3, 4, AddressingMode::Absolute),
 
-OpCode::new(0xE0, "CMY", 2, 2, AddressingMode::Immediate),
-OpCode::new(0xE4, "CMY", 2, 3, AddressingMode::ZeroPage),
-OpCode::new(0xEC, "CMY", 3, 4, AddressingMode::Absolute),
-
 OpCode::new(0xC0, "CMY", 2, 2, AddressingMode::Immediate),
 OpCode::new(0xC4, "CMY", 2, 3, AddressingMode::ZeroPage),
 OpCode::new(0xCC, "CMY", 3, 4, AddressingMode::Absolute),

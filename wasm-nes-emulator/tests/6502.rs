@@ -592,7 +592,6 @@ mod beq {
         assert_eq!(cpu.register_a, 0x00);
     }
 }
-//new
 mod inc {
     use super::*;
     
@@ -755,10 +754,10 @@ mod cmp {
     }
 }
 
-mod cmx {
+mod cpx {
     use super::*;
     #[test]
-    fn cmx_eq() {
+    fn cpx_eq() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xa2, 0x05 , 0xe0, 0x05 , 0xd0, 0x02, 0xa2, 0x01, 0x00]);
         
@@ -766,7 +765,7 @@ mod cmx {
         
     }
     #[test]
-    fn cmx_gt_p() {
+    fn cpx_gt_p() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xa2, 0x05, 0xe0, 0x03, 0xf0, 0x04, 0xb0, 0x02, 0xa2, 0x00, 0x00]);
         
@@ -775,7 +774,7 @@ mod cmx {
     }
     
     #[test]
-    fn cmx_gt_f() {
+    fn cpx_gt_f() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xa2, 0x05, 0xe0, 0x09, 0xf0, 0x04, 0xb0, 0x02, 0xa2, 0x00, 0x00]);
         
@@ -784,7 +783,7 @@ mod cmx {
     }
     
     #[test]
-    fn cmx_lt_p() {
+    fn cpx_lt_p() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xa2, 0x03, 0xe0, 0x05, 0x90, 0x02, 0xa2, 0x00, 0x00]);
         
@@ -793,7 +792,7 @@ mod cmx {
     }
     
     #[test]
-    fn cmx_lt_f() {
+    fn cpx_lt_f() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xa2, 0x09, 0xe0, 0x05, 0x90, 0x02, 0xa2, 0x00, 0x00]);
         
@@ -802,10 +801,10 @@ mod cmx {
     }
 }
 
-mod cmy {
+mod cpy {
     use super::*;
     #[test]
-    fn cmy_eq() {
+    fn cpy_eq() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xa0, 0x05 , 0xc0, 0x05 , 0xd0, 0x02, 0xa0, 0x01, 0x00]);
         
@@ -813,7 +812,7 @@ mod cmy {
         
     }
     #[test]
-    fn cmy_gt_p() {
+    fn cpy_gt_p() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xa0, 0x05, 0xc0, 0x03, 0xf0, 0x04, 0xb0, 0x02, 0xa0, 0x00, 0x00]);
         
@@ -822,7 +821,7 @@ mod cmy {
     }
     
     #[test]
-    fn cmy_gt_f() {
+    fn cpy_gt_f() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xa0, 0x05, 0xc0, 0x09, 0xf0, 0x04, 0xb0, 0x02, 0xa0, 0x00, 0x00]);
         
@@ -831,7 +830,7 @@ mod cmy {
     }
     
     #[test]
-    fn cmy_lt_p() {
+    fn cpy_lt_p() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xa0, 0x03, 0xc0, 0x05, 0x90, 0x02, 0xa0, 0x00, 0x00]);
         
@@ -840,9 +839,18 @@ mod cmy {
     }
     
     #[test]
-    fn cmy_lt_f() {
+    fn cpy_lt_f() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xa0, 0x09, 0xc0, 0x05, 0x90, 0x02, 0xa0, 0x00, 0x00]);
+        
+        assert_eq!(cpu.register_y, 0x00);
+        
+    }
+    
+    #[test]
+    fn cpy_y_reg_full() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa0, 0xff, 0xc0, 0xff, 0xd0, 0x02, 0xa0, 0x00, 0x00]);
         
         assert_eq!(cpu.register_y, 0x00);
         

@@ -1,6 +1,5 @@
 use wasm_bindgen::prelude::*;
 extern crate web_sys;
-use web_sys::window;
 
 use std::collections::HashMap;
 use crate::opcodes;
@@ -28,6 +27,8 @@ pub struct CPU {
     //NV1BDIZC
     pub status: u8,
     pub program_counter: u16,
+    pub update: bool,
+    pub check: bool,
     memory: [u8; 0xFFFF]
 }
 
@@ -40,6 +41,8 @@ impl CPU {
             register_y: 0,
             status: 0,
             program_counter: 0,
+            update: false,
+            check: false,
             memory: [0; 0xFFFF],
         }
     }
@@ -51,6 +54,8 @@ impl CPU {
     pub fn load_pro(&mut self, program: Vec<u8>) {
         self.memory[0x8000 .. (0x8000 + program.len())].copy_from_slice(&program[..]);
         self.mem_write_u16(0xFFFC, 0x8000);
+        
+        self.reset();
     }
     
 }
@@ -62,7 +67,11 @@ impl CPU {
     }
     
     pub fn mem_write(&mut self, addr: u16, data: u8) {
+    //check if #$0200
         self.memory[addr as usize] = data;
+        if addr >= 0x0200 && addr <= 0x05ff {
+            self.update = true;
+        }
     }
     
     fn mem_read_u16(&mut self, pos: u16) -> u16 {
@@ -162,6 +171,10 @@ impl CPU {
 #[wasm_bindgen]
 impl CPU {
 
+    pub fn reset_update(&mut self) {
+        self.update = false;
+    }
+
     pub fn next(&mut self) -> bool {
         
         let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPSCODES_MAP;
@@ -173,7 +186,7 @@ impl CPU {
             let program_counter_state = self.program_counter;
             
             let opcode = opcodes.get(&code).expect(&format!("Code: {:x} not found", code));
-            
+                        
             match code {
                 0x85 | 0x95 | 0x8D | 0x9D | 0x99 | 0x81 | 0x91 => self.write_reg(&opcode.address_mode, self.register_a),
                 0x86 | 0x96 | 0x8E => self.write_reg(&opcode.address_mode, self.register_x),
@@ -248,25 +261,32 @@ impl CPU {
     }
     
     fn add_to_reg_a(&mut self, value: u8) {
-        let mut sum: u16 = (self.register_a as u16) + (value as u16);
+        let mut sum: u16 = (self.register_a as u16) + (value as u16) + (if self.status & 0b0000_0001 != 0 {
+                1
+            } else {
+                0
+            });
+        
         if sum > 0xFF {
             sum = sum - 256;
             self.status = self.status | 0b0000_0001; //add carry flag
         } else {
              self.status = self.status & 0b1111_1110; //remove carry flag
         }
+        
         if (value ^ (sum as u8)) & ((sum as u8) ^ self.register_a) & 0x80 != 0 {
              self.status = self.status | 0b0100_0000; //add overflow flag
         } else {
             self.status = self.status & 0b1011_1111; //remove overflow flag
         }
+        
         self.register_a = sum as u8;
         self.update_zero_and_negative_flags(self.register_a);
     }
     
     fn branch(&mut self, cond: bool) {
         if cond {
-            let value = self.mem_read(self.program_counter);//get the jump ammount from next line
+            let value = self.mem_read(self.program_counter) as i8;//get the jump ammount from next line
             let jump_addr = self
                     .program_counter
                     .wrapping_add(1)
@@ -338,10 +358,7 @@ impl CPU {
     }
         
     fn lda(&mut self, mode: &AddressingMode) {
-    
-        let window = window().unwrap();
-       window.alert_with_message("Win!");
-        
+            
        let value = self.get_value(mode);
        self.register_a = value;
        self.update_zero_and_negative_flags(self.register_a);
@@ -366,7 +383,7 @@ impl CPU {
     
      fn txa(&mut self) {
         self.register_a = self.register_x;
-        self.update_zero_and_negative_flags(self.register_x);
+        self.update_zero_and_negative_flags(self.register_a);
     }
     
     fn inx(&mut self) {
