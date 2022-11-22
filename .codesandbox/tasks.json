@@ -1,12 +1,26 @@
 {
   // These tasks will run in order when initializing your CodeSandbox project.
-  "setupTasks": ["rustup", "wp-install", "run"],
+  "setupTasks": [
+    {
+      "name": "rustup",
+      "command": "rustup"
+    },
+    {
+      "name": "wp-install",
+      "command": "wp-install"
+    },
+    {
+      "name": "run",
+      "command": "run"
+    }
+  ],
 
   // These tasks can be run from CodeSandbox. Running one will open a log in the app.
   "tasks": {
     "rustup": {
       "name": "rustup",
-      "command": "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+      "command": "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh",
+      "runAtStart": true
     },
     "wp-install": {
       "name": "wp-install",

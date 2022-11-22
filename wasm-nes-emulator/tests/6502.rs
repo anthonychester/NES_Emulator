@@ -856,3 +856,23 @@ mod cpy {
         
     }
 }
+
+mod dec {
+    use super::*;
+    
+    #[test]
+    fn dec_9() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0x09, 0x85, 0x02, 0xe6, 0x02, 0xa5, 0x02, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x0a);
+        
+    }
+    #[test]
+    fn dec_overflow() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xa9, 0xff, 0x85, 0x02, 0xe6, 0x02, 0xa5, 0x02, 0x00]);
+        
+        assert_eq!(cpu.register_a, 0x00);
+        
+    }
