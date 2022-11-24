@@ -29,8 +29,6 @@ mod multi {
       assert_eq!(cpu.register_a, 0x05);
    } 
 }
-
-
 mod sta {
     use super::*;
     
@@ -685,7 +683,6 @@ mod flag_inst {
         
     }
 }
-
 mod bit {
     use super::*;
     #[test]
@@ -706,7 +703,6 @@ mod bit {
         
     }
 }
-
 mod cmp {
     use super::*;
     #[test]
@@ -753,7 +749,6 @@ mod cmp {
         
     }
 }
-
 mod cpx {
     use super::*;
     #[test]
@@ -800,7 +795,6 @@ mod cpx {
         
     }
 }
-
 mod cpy {
     use super::*;
     #[test]
@@ -856,23 +850,101 @@ mod cpy {
         
     }
 }
-
+//--new--
 mod dec {
     use super::*;
     
     #[test]
     fn dec_9() {
         let mut cpu = CPU::new();
-        cpu.load_and_run(vec![0xa9, 0x09, 0x85, 0x02, 0xe6, 0x02, 0xa5, 0x02, 0x00]);
+        cpu.load_and_run(vec![0xa9, 0x09, 0x85, 0x02, 0xc6, 0x02, 0xa5, 0x02, 0x00]);
         
-        assert_eq!(cpu.register_a, 0x0a);
+        assert_eq!(cpu.register_a, 0x08);
         
     }
     #[test]
     fn dec_overflow() {
         let mut cpu = CPU::new();
-        cpu.load_and_run(vec![0xa9, 0xff, 0x85, 0x02, 0xe6, 0x02, 0xa5, 0x02, 0x00]);
+        cpu.load_and_run(vec![0xa9, 0x00, 0x85, 0x02, 0xc6, 0x02, 0xa5, 0x02, 0x00]);
         
-        assert_eq!(cpu.register_a, 0x00);
+        assert_eq!(cpu.register_a, 0xff);
         
     }
+}
+mod asl {
+    use super::*;
+
+    #[test]
+    fn asl_4() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![0xa9, 0x04, 0x0a, 0x00]);
+
+        assert_eq!(cpu.register_a, 0x08)
+    }
+
+    #[test]
+    fn asl_flags() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![0xa9, 0xf0, 0x0a, 0x00]);
+
+        assert_eq!(cpu.status, 0b10000001)
+    }
+    
+    #[test]
+    fn asl_zero() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![0xa9, 0x00, 0x0a, 0x00]);
+
+        assert_eq!(cpu.status, 0b00000010)
+    }
+
+    #[test]
+    fn asl_full() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![0xa9, 0x08, 0x85, 0x02, 0x06, 0x02, 0xa5, 0x02, 0x00]);
+
+        assert_eq!(cpu.register_a, 0x10)
+    }
+}
+mod jmp {
+    use super::*;
+
+    #[test]
+    fn jmp_skip_some() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![0x4c, 0x05, 0x80, 0xa9, 0x01, 0xa9, 0x02, 0x4c, 0x0c, 0x80, 0xa9, 0x00, 0x00]);
+
+        assert_eq!(cpu.register_a, 0x02);
+    }
+}
+mod txs {
+    use super::*;
+    #[test]
+    fn txs() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![0xa2, 0x05, 0x9a, 0x00]);
+
+        assert_eq!(cpu.stack_ptr, 0x05);
+    }
+}
+mod tsx {
+    use super::*;
+
+    #[test]
+    fn txs() {
+        let mut cpu = CPU::new();
+
+        cpu.load(vec![0xba, 0x00]);
+        cpu.reset();
+        cpu.stack_ptr = 0x05;
+        cpu.run();
+
+        assert_eq!(cpu.register_x, 0x05);
+    }
+}

@@ -153,6 +153,24 @@ OpCode::new(0xEC, "CMX", 3, 4, AddressingMode::Absolute),
 OpCode::new(0xC0, "CMY", 2, 2, AddressingMode::Immediate),
 OpCode::new(0xC4, "CMY", 2, 3, AddressingMode::ZeroPage),
 OpCode::new(0xCC, "CMY", 3, 4, AddressingMode::Absolute),
+
+OpCode::new(0xC6, "DEC", 2, 5, AddressingMode::ZeroPage),
+OpCode::new(0xD6, "DEC", 2, 6, AddressingMode::ZeroPage_X),
+OpCode::new(0xCE, "DEC", 3, 6, AddressingMode::Absolute),
+OpCode::new(0xDE, "DEC", 3, 7, AddressingMode::Absolute_X),
+
+OpCode::new(0x0A, "ASL", 1, 2, AddressingMode::NoneAddressing),
+OpCode::new(0x06, "ASL", 2, 5, AddressingMode::ZeroPage),
+OpCode::new(0x16, "ASL", 2, 6, AddressingMode::ZeroPage_X),
+OpCode::new(0x0E, "ASL", 3, 6, AddressingMode::Absolute),
+OpCode::new(0x1E, "ASL", 3, 7, AddressingMode::Absolute_X),
+
+OpCode::new(0x4C, "JMP", 3, 3, AddressingMode::Absolute),
+OpCode::new(0x6C, "JMP", 3, 5, AddressingMode::NoneAddressing),
+
+OpCode::new(0x9A, "TXS", 1, 2, AddressingMode::NoneAddressing),
+OpCode::new(0xBA, "TSX", 1, 2, AddressingMode::NoneAddressing),
+
 ];
 
 pub static ref OPSCODES_MAP: HashMap<u8, &'static OpCode> = {

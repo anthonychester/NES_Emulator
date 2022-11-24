@@ -4,7 +4,7 @@ extern crate web_sys;
 use std::collections::HashMap;
 use crate::opcodes;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum AddressingMode {
    Immediate,
@@ -29,7 +29,8 @@ pub struct CPU {
     pub program_counter: u16,
     pub update: bool,
     pub check: bool,
-    memory: [u8; 0xFFFF]
+    memory: [u8; 0xFFFF],
+    pub stack_ptr: u8,
 }
 
 #[wasm_bindgen]
@@ -44,6 +45,7 @@ impl CPU {
             update: false,
             check: false,
             memory: [0; 0xFFFF],
+            stack_ptr: 0,
         }
     }
 
@@ -152,6 +154,7 @@ impl CPU {
         self.register_x = 0;
         self.register_y = 0;
         self.status = 0;
+        self.stack_ptr = 0;
         self.program_counter = self.mem_read_u16(0xFFFC);
     }
     
@@ -181,7 +184,7 @@ impl CPU {
         
         //let opscode = self.mem_read(self.program_counter);
             let code = self.mem_read(self.program_counter);
-            println!("{:x}", code);
+            //println!("{:x}", code);
             self.program_counter += 1;
             let program_counter_state = self.program_counter;
             
@@ -227,6 +230,11 @@ impl CPU {
                 0xC9 | 0xC5 | 0xD5 | 0xCD | 0xDD | 0xD9 | 0xC1 | 0xD1 => self.compare(self.register_a, &opcode.address_mode),
                 0xE0 | 0xE4 | 0xEC => self.compare(self.register_x, &opcode.address_mode),
                 0xC0 | 0xC4 | 0xCC => self.compare(self.register_y, &opcode.address_mode),
+                0xC6 | 0xD6 | 0xCE | 0xDE => self.dec(&opcode.address_mode),
+                0x0A | 0x06 | 0x16 | 0x0E | 0x1E => self.asl(&opcode.address_mode),
+                0x4C | 0x6C => self.jmp(&opcode.address_mode),
+                0x9A => self.txs(),
+                0xBA => self.tsx(),
                 0xEA => (),
                 0x00 => {
                     return true;
@@ -246,7 +254,6 @@ impl CPU {
     let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPSCODES_MAP;
     
         loop {
-            
             if self.next() { //return true if needed to break
                 break;
             }
@@ -299,6 +306,7 @@ impl CPU {
     fn set_flag(&mut self, flag: u8) {
         self.status = self.status | flag;
     }
+
     fn rem_flag(&mut self, flag: u8) {
         self.status = self.status & flag;
     }
@@ -464,6 +472,68 @@ impl CPU {
         self.update_zero_and_negative_flags(value);
     }
     
+    fn asl(&mut self, mode: &AddressingMode) {
+        let old_val: u8;
+        let new_val: u8;
+        if mode == &AddressingMode::NoneAddressing {
+            old_val = self.register_a;
+            self.register_a = old_val << 1;
+            new_val = self.register_a;
+            if new_val == 0 {
+                self.status = self.status | 0b0000_0010;
+            } else {
+                self.status = self.status & 0b1111_1101;
+            }
+
+        } else {
+            let addr = self.get_operand_address(mode);
+            old_val = self.mem_read(addr);
+            new_val = old_val << 1;
+            self.mem_write(addr, new_val);
+        }
+
+        if new_val & 0b1000_0000 != 0 {
+            self.status = self.status | 0b1000_0000;
+        } else {
+            self.status = self.status & 0b0111_1111;
+        }
+
+        if old_val & 0b1000_0000 != 0 {
+            self.status = self.status | 0b0000_0001;
+        } else {
+            self.status = self.status & 0b1111_1110;
+        }
+
+    }
+
+    fn jmp(&mut self, mode: &AddressingMode) {
+        if mode == &AddressingMode::Absolute {
+            let mem_address = self.get_operand_address(mode);
+            self.program_counter = mem_address;
+        } else {
+            let mem_address = self.mem_read_u16(self.program_counter);
+
+            let indirect_ref = if mem_address & 0x00FF == 0x00FF {
+                let lo = self.mem_read(mem_address);
+                let hi = self.mem_read(mem_address & 0xFF00);
+                (hi as u16) << 8 | (lo as u16)
+            } else {
+                self.mem_read_u16(mem_address)
+            };
+
+            self.program_counter = indirect_ref;
+        }
+    }
+
+    fn txs(&mut self) {
+        self.stack_ptr = self.register_x;
+    }
+    
+    fn tsx(&mut self) {
+        self.register_x = self.stack_ptr;
+        self.update_zero_and_negative_flags(self.register_x);
+    }
+
     fn update_zero_and_negative_flags(&mut self, result: u8) {
         if result == 0 {
             self.status = self.status | 0b0000_0010;
@@ -477,5 +547,4 @@ impl CPU {
             self.status = self.status & 0b0111_1111;
         }
     }
-    
 }
