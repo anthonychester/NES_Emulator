@@ -154,7 +154,7 @@ impl CPU {
         self.register_x = 0;
         self.register_y = 0;
         self.status = 0;
-        self.stack_ptr = 0;
+        self.stack_ptr = 0x00;
         self.program_counter = self.mem_read_u16(0xFFFC);
     }
     
@@ -233,8 +233,12 @@ impl CPU {
                 0xC6 | 0xD6 | 0xCE | 0xDE => self.dec(&opcode.address_mode),
                 0x0A | 0x06 | 0x16 | 0x0E | 0x1E => self.asl(&opcode.address_mode),
                 0x4C | 0x6C => self.jmp(&opcode.address_mode),
-                0x9A => self.txs(),
+                0x9A =>  self.stack_ptr = self.register_x,
                 0xBA => self.tsx(),
+                0x48 => self.push_stack(self.register_a),
+                0x68 => self.pha(),
+                0x08 => self.push_stack(self.status),
+                0x28 => self.status = self.pull_stack(),
                 0xEA => (),
                 0x00 => {
                     return true;
@@ -332,6 +336,17 @@ impl CPU {
         }
     }
     
+    fn push_stack(&mut self, data: u8) {
+        self.stack_ptr = self.stack_ptr.wrapping_sub(1);
+        self.mem_write(0x0100 + (self.stack_ptr as u16), data);
+    }
+
+    fn pull_stack(&mut self) -> u8 {
+        let data = self.mem_read(0x0100 + (self.stack_ptr as u16));
+        self.stack_ptr = self.stack_ptr.wrapping_add(1);
+        return data;
+    }
+
     fn bit(&mut self, mode: &AddressingMode) {
         let value = self.get_value(mode);
         let res = self.register_a & value;
@@ -524,14 +539,15 @@ impl CPU {
             self.program_counter = indirect_ref;
         }
     }
-
-    fn txs(&mut self) {
-        self.stack_ptr = self.register_x;
-    }
     
     fn tsx(&mut self) {
         self.register_x = self.stack_ptr;
         self.update_zero_and_negative_flags(self.register_x);
+    }
+
+    fn pha(&mut self) {
+        self.register_a = self.pull_stack();
+        self.update_zero_and_negative_flags(self.register_a);
     }
 
     fn update_zero_and_negative_flags(&mut self, result: u8) {

@@ -850,7 +850,6 @@ mod cpy {
         
     }
 }
-//--new--
 mod dec {
     use super::*;
     
@@ -946,5 +945,55 @@ mod tsx {
         cpu.run();
 
         assert_eq!(cpu.register_x, 0x05);
+    }
+}
+//--new--
+mod pha {
+    use super::*;
+
+    #[test]
+    fn pha() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![0xa9, 0x05, 0x48, 0x48, 0x00]);
+
+
+        assert_eq!(cpu.mem_read(0x01ff), 0x05);
+        assert_eq!(cpu.mem_read(0x01fe), 0x05);
+    }
+}
+mod pla {
+    use super::*;
+
+    #[test]
+    fn pla() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![0xa9, 0x05, 0x48, 0xa9, 0x00, 0x68, 0x00]);
+
+        assert_eq!(cpu.register_a, 0x05);
+        assert_eq!(cpu.stack_ptr, 0x00);
+    }
+}
+mod php {
+    use super::*;
+    #[test]
+    fn php() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![0xa9, 0x7f, 0x69, 0x01, 0x08, 0x00]);
+
+        assert_eq!(cpu.mem_read(0x01ff), 0xc0);
+    }
+}
+mod plp {
+    use super::*;
+    #[test]
+    fn plp() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![0xa9, 0x7f, 0x69, 0x01, 0x08, 0xB8, 0x28, 0x00]);
+
+        assert_eq!(cpu.status, 0xc0);
     }
 }
