@@ -189,7 +189,7 @@ impl CPU {
             let program_counter_state = self.program_counter;
             
             let opcode = opcodes.get(&code).expect(&format!("Code: {:x} not found", code));
-                        
+            //println!("{}", opcode.name);
             match code {
                 0x85 | 0x95 | 0x8D | 0x9D | 0x99 | 0x81 | 0x91 => self.write_reg(&opcode.address_mode, self.register_a),
                 0x86 | 0x96 | 0x8E => self.write_reg(&opcode.address_mode, self.register_x),
@@ -239,6 +239,8 @@ impl CPU {
                 0x68 => self.pha(),
                 0x08 => self.push_stack(self.status),
                 0x28 => self.status = self.pull_stack(),
+                0x20 => self.jsr(&opcode.address_mode),
+                0x60 => self.rts(),
                 0xEA => (),
                 0x00 => {
                     return true;
@@ -548,6 +550,21 @@ impl CPU {
     fn pha(&mut self) {
         self.register_a = self.pull_stack();
         self.update_zero_and_negative_flags(self.register_a);
+    }
+
+    fn jsr(&mut self, mode: &AddressingMode) {
+        let addr = (self.program_counter + 2) - 1; //+2 for u16 bit or jmp address
+        let hi = (addr >> 8) as u8;
+        let lo = (addr & 0xff) as u8;
+        self.push_stack(hi);
+        self.push_stack(lo);
+        self.program_counter = self.get_operand_address(mode);
+    }
+
+    fn rts(&mut self) {
+        let lo = self.pull_stack() as u16;
+        let hi = self.pull_stack() as u16;
+        self.program_counter = ((hi << 8) | (lo as u16)) + 1;
     }
 
     fn update_zero_and_negative_flags(&mut self, result: u8) {

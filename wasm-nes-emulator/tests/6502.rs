@@ -947,7 +947,6 @@ mod tsx {
         assert_eq!(cpu.register_x, 0x05);
     }
 }
-//--new--
 mod pha {
     use super::*;
 
@@ -995,5 +994,36 @@ mod plp {
         cpu.load_and_run(vec![0xa9, 0x7f, 0x69, 0x01, 0x08, 0xB8, 0x28, 0x00]);
 
         assert_eq!(cpu.status, 0xc0);
+    }
+}
+mod jsr {
+    use super::*;
+    #[test]
+    fn jsr() {
+        let mut cpu = CPU::new();
+
+       cpu.load(vec![0x20, 0x03, 0x80, 0x00]);
+       cpu.reset();
+       cpu.next(); //jsr
+        assert_eq!(cpu.mem_read(0x1ff), 0x80);
+        assert_eq!(cpu.mem_read(0x1fe), 0x02);
+        assert_eq!(cpu.program_counter, 0x8003);
+    }
+}
+mod rts {
+    use super::*;
+    #[test]
+    fn rts() {
+        let mut cpu = CPU::new();
+
+       cpu.load(vec![0x20, 0x05, 0x80, 0xa2, 0x05, 0xa9, 0x05, 0x60, 0x00]);
+       cpu.reset();
+       cpu.next(); //JSR
+       cpu.next(); //LDA
+       cpu.next(); //RTS
+       println!("pc: {}", cpu.mem_read(cpu.program_counter));
+        assert_eq!(cpu.register_a, 0x05);
+        assert_eq!(cpu.register_x == 0x05, false);
+        assert_eq!(cpu.program_counter, 0x8003);
     }
 }
