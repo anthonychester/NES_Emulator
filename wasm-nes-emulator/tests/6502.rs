@@ -1021,9 +1021,105 @@ mod rts {
        cpu.next(); //JSR
        cpu.next(); //LDA
        cpu.next(); //RTS
-       println!("pc: {}", cpu.mem_read(cpu.program_counter));
         assert_eq!(cpu.register_a, 0x05);
         assert_eq!(cpu.register_x == 0x05, false);
         assert_eq!(cpu.program_counter, 0x8003);
+    }
+}
+mod rol {
+    use super::*;
+    #[test]
+    fn rol() {
+        let mut cpu = CPU::new();
+
+       cpu.load_and_run(vec![0xa9, 0xff, 0x2a, 0x00]);
+
+        assert_eq!(cpu.register_a, 0xfe);
+        assert_eq!(cpu.status, 0b1000_0001);
+    }
+    
+    #[test]
+    fn rol_zero() {
+        let mut cpu = CPU::new();
+
+       cpu.load_and_run(vec![0xa9, 0x00, 0x2a, 0x00]);
+
+        assert_eq!(cpu.register_a, 0x00);
+        assert_eq!(cpu.status, 0b0000_0010);
+    }
+    
+    #[test]
+    fn rol_mem() {
+        let mut cpu = CPU::new();
+
+       cpu.load_and_run(vec![0xa9, 0xff, 0x85, 0x01, 0x26, 0x01, 0x00]);
+
+        assert_eq!(cpu.mem_read(0x0001), 0xfe);
+        assert_eq!(cpu.status, 0b1000_0001);
+    }
+}
+
+mod ror {
+    use super::*;
+    #[test]
+    fn ror() {
+        let mut cpu = CPU::new();
+
+       cpu.load_and_run(vec![0xa9, 0xff, 0x6a, 0x00]);
+
+        assert_eq!(cpu.register_a, 0x7f);
+        assert_eq!(cpu.status, 0b0000_0001);
+    }
+    
+    #[test]
+    fn ror_zero() {
+        let mut cpu = CPU::new();
+
+       cpu.load_and_run(vec![0xa9, 0x00, 0x6a, 0x00]);
+
+        assert_eq!(cpu.register_a, 0x00);
+        assert_eq!(cpu.status, 0b0000_0010);
+    }
+    
+    #[test]
+    fn ror_mem() {
+        let mut cpu = CPU::new();
+
+       cpu.load_and_run(vec![0xa9, 0xff, 0x85, 0x01, 0x66, 0x01, 0x00]);
+
+        assert_eq!(cpu.mem_read(0x0001), 0x7f);
+        assert_eq!(cpu.status, 0b0000_0001);
+    }
+}
+mod lsr {
+    use super::*;
+    #[test]
+    fn lsr() {
+        let mut cpu = CPU::new();
+
+       cpu.load_and_run(vec![0xa9, 0xff, 0x4a, 0x00]);
+
+        assert_eq!(cpu.register_a, 0x7f);
+        assert_eq!(cpu.status, 0b0000_0001);
+    }
+    
+    #[test]
+    fn lsr_zero() {
+        let mut cpu = CPU::new();
+
+       cpu.load_and_run(vec![0xa9, 0x00, 0x4a, 0x00]);
+
+        assert_eq!(cpu.register_a, 0x00);
+        assert_eq!(cpu.status, 0b0000_0010);
+    }
+    
+    #[test]
+    fn lsr_mem() {
+        let mut cpu = CPU::new();
+
+       cpu.load_and_run(vec![0xa9, 0xff, 0x85, 0x01, 0x46, 0x01, 0x00]);
+
+        assert_eq!(cpu.mem_read(0x0001), 0x7f);
+        assert_eq!(cpu.status, 0b0000_0001);
     }
 }
