@@ -241,6 +241,24 @@ impl CPU {
                 0x28 => self.status = self.pull_stack(),
                 0x20 => self.jsr(&opcode.address_mode),
                 0x60 => self.rts(),
+                0x2A => self.register_a = self.rol_val(self.register_a),
+                0x26 | 0x36 | 0x2E | 0x3E => {
+                    let addr = self.get_operand_address(&opcode.address_mode);
+                    let rolled = self.rol_val(self.mem_read(addr));
+                    self.mem_write(addr, rolled)
+                },
+                0x6A => self.register_a = self.ror_val(self.register_a),
+                0x66 | 0x76 | 0x6E | 0x7E => {
+                    let addr = self.get_operand_address(&opcode.address_mode);
+                    let rolled = self.ror_val(self.mem_read(addr));
+                    self.mem_write(addr, rolled)
+                },
+                0x4A => self.register_a = self.lsr_val(self.register_a),
+                0x46 | 0x56 | 0x4E | 0x5E => {
+                    let addr = self.get_operand_address(&opcode.address_mode);
+                    let rolled = self.lsr_val(self.mem_read(addr));
+                    self.mem_write(addr, rolled)
+                },
                 0xEA => (),
                 0x00 => {
                     return true;
@@ -565,6 +583,51 @@ impl CPU {
         let lo = self.pull_stack() as u16;
         let hi = self.pull_stack() as u16;
         self.program_counter = ((hi << 8) | (lo as u16)) + 1;
+    }
+
+    fn rol_val(&mut self, val: u8) -> u8 {
+        let mut carry = 0b0000_0000;
+        if self.status & 0b0000_0001 != 0 {
+            carry = 0b0000_0001;
+        }
+        
+        if val & 0b1000_0000 != 0 {
+            self.status = self.status | 0b0000_0001;
+        } else {
+            self.status = self.status & 0b1111_1110;
+        }
+        self.status = self.status | carry;
+        let shifted = val << 1;
+        self.update_zero_and_negative_flags(shifted);
+        return shifted;
+    }
+
+    fn ror_val(&mut self, val: u8) -> u8 {
+        let mut carry = 0b0000_0000;
+        if self.status & 0b0000_0001 != 0 {
+            carry = 0b1000_0000;
+        }
+    
+        if val & 0b0000_0001 != 0 {
+            self.status = self.status | 0b0000_0001;
+        } else {
+            self.status = self.status & 0b1111_1110;
+        }
+        self.status = self.status | carry;
+        let shifted = val >> 1;
+        self.update_zero_and_negative_flags(shifted);
+        return shifted;
+    }
+
+    fn lsr_val(&mut self, val: u8) -> u8 {
+        if val & 0b0000_0001 != 0 {
+            self.status = self.status | 0b0000_0001;
+        } else {
+            self.status = self.status & 0b1111_1110;
+        }
+        let shifted = val >> 1;
+        self.update_zero_and_negative_flags(shifted);
+        return shifted;
     }
 
     fn update_zero_and_negative_flags(&mut self, result: u8) {
