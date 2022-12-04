@@ -241,6 +241,7 @@ impl CPU {
                 0x28 => self.status = self.pull_stack(),
                 0x20 => self.jsr(&opcode.address_mode),
                 0x60 => self.rts(),
+                0x40 => self.rti(),
                 0xEA => (),
                 0x00 => {
                     return true;
@@ -565,6 +566,17 @@ impl CPU {
         let lo = self.pull_stack() as u16;
         let hi = self.pull_stack() as u16;
         self.program_counter = ((hi << 8) | (lo as u16)) + 1;
+    }
+
+    fn rti(&mut self) {
+        self.status = self.pull_stack();
+        self.status = self.status & 0b1110_1111;
+        self.status = self.status | 0b0010_0000;
+
+        let lo = self.pull_stack() as u16;
+        let hi = self.pull_stack() as u16;
+
+        self.program_counter = hi << 8 | lo;
     }
 
     fn update_zero_and_negative_flags(&mut self, result: u8) {
