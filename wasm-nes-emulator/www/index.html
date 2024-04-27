@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Hello wasm-pack!</title>
+    <title>NES EMULATOR</title>
     <style>
   body {
     position: absolute;
@@ -14,22 +14,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    font-family: Arial
   }
   
-  #fps {
-  white-space: pre;
-  font-family: monospace;
-}
 </style>
   </head>
   <body>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser</noscript>
-    <p id="pc"></p>
-    <button id="next">Next</button>
-    <p id="reg"></p>
-    <p id="check"></p>
+    <h2>NES EMULATOR</h2>
     <canvas id="canvas"></canvas>
-    <p id="mem"></p>
+    <br>
+    <button id="reset">Reset</button>
     <script src="./bootstrap.js"></script>
   </body>
 </html>

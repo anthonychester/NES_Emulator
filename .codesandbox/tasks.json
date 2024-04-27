@@ -2,12 +2,12 @@
   // These tasks will run in order when initializing your CodeSandbox project.
   "setupTasks": [
     {
-      "name": "rustup",
-      "command": "rustup"
+      "command": "cd wasm-nes-emulator/www && npm install",
+      "name": "npm install"
     },
     {
-      "name": "wp-install",
-      "command": "wp-install"
+      "command": "cd wasm-nes-emulator && curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh",
+      "name": "install wasm-pack"
     },
     {
       "name": "run",
@@ -37,6 +37,11 @@
     "test": {
       "name": "test",
       "command": "cd wasm-nes-emulator && cargo test"
+    },
+    "cd wasm-nes-emulator/ && cargo build": {
+      "name": "cd wasm-nes-emulator/ && cargo build",
+      "command": "cd wasm-nes-emulator/ && cargo build",
+      "runAtStart": true
     }
   }
 }
